@@ -1,0 +1,6 @@
+--package org.example.html_app
+--name "My WebView HTML Application"
+--dist_name my_app
+--version 0.1
+--port 5005
+--requirements python3,hostpython3,sqlite3,sqlparse,asgiref,pytz,pyjnius
