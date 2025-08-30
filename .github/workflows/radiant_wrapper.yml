@@ -75,7 +75,7 @@ jobs:
           # Cleanup downloaded wheel files
           if ls *.whl 1> /dev/null 2>&1; then rm *.whl; fi
 
-  # Configure build inclusion/exclusion rules
+          # Configure build inclusion/exclusion rules
           # Exclude Python bytecode files
           echo "*.pyc" > blacklist.txt
           
