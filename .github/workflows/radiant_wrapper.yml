@@ -73,9 +73,9 @@ jobs:
           sed -i 's/^[[:space:]]\{2,4\}//' main.py
   
           # Cleanup downloaded wheel files
-          rm *.whl
-          
-          # Configure build inclusion/exclusion rules
+          if ls *.whl 1> /dev/null 2>&1; then rm *.whl; fi
+
+  # Configure build inclusion/exclusion rules
           # Exclude Python bytecode files
           echo "*.pyc" > blacklist.txt
           
