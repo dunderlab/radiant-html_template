@@ -116,28 +116,24 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      # ADDED: Create release in target repo
       - name: Create release in dunderlab/Release-APK
         env:
-          GH_TOKEN: ${{ secrets.RELEASE_PAT }}   # PAT with repo write on target repo
+          GH_TOKEN: ${{ secrets.RELEASE_PAT }}
           TARGET_REPO: dunderlab/Release-APK
           TAG: ${{ steps.meta.outputs.tag }}
         run: |
-          set -e
+          gh --version
           gh release view "$TAG" -R "$TARGET_REPO" >/dev/null 2>&1 || \
           gh release create "$TAG" -R "$TARGET_REPO" \
             --title "$TAG" \
             --notes "Automated release from ${{ github.repository }}@${{ github.sha }}"
 
-      # ADDED: Upload all APKs as assets
       - name: Upload APK assets
         env:
           GH_TOKEN: ${{ secrets.RELEASE_PAT }}
           TARGET_REPO: dunderlab/Release-APK
           TAG: ${{ steps.meta.outputs.tag }}
         run: |
-          set -e
-          shopt -s nullglob
           for f in ./*.apk; do
             gh release upload "$TAG" "$f" -R "$TARGET_REPO" --clobber
             echo "URL: https://github.com/$TARGET_REPO/releases/download/$TAG/$(basename "$f")"
