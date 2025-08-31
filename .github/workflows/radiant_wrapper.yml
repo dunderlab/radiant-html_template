@@ -20,80 +20,129 @@ jobs:
 
       - name: Execute Command in Docker Container
         run: |
-          # Pull the Docker image used for building Android APKs
-          docker pull dunderlab/radiant_p4a:latest
-          
-          # Get the distribution name from .p4a config file
-          DIST_NAME=$(grep -E '^--dist_name ' .p4a | awk '{print $2}')
-          
-          # Handle Radiant Framework
-          if [ -f "main.py" ] && grep -q "radiant.wrapper" main.py; then
-              pip download  --no-deps radiant-framework
-              unzip radiant_framework*.whl "radiant/*" -d .
-          fi
-          
-          # Handle Django app setup
-          if [ -f "$DIST_NAME/manage.py" ]; then
-            pip download --no-deps django
-            unzip django*.whl "django/*" -d .
-            pip download  --no-deps radiant-wrapper
-            unzip radiant_wrapper*.whl "radiant/*" -d .
-            echo '
-            from radiant.wrapper import django_server
-            with open(".p4a", "r", encoding="utf-8") as f:
-                for line in f:
-                    if line.strip().startswith("--port"):
-                        PORT = int(line.split()[1])
-                    if line.strip().startswith("--dist_name"):
-                        DIST_NAME = line.split()[1].strip()
-            sys.path.append(os.path.join(os.path.dirname(__file__)))
-            sys.path.append(os.path.join(os.path.dirname(__file__), DIST_NAME))
-            django_server.main(DIST_NAME, ip="127.0.0.1", port=PORT)
-            ' > main.py
-          fi
-          
-          # Handle static HTML app setup
-          # Creates main.py with simple HTTP server for static files
-          if [ -f "index.html" ]; then
-            pip download  --no-deps radiant-wrapper
-            unzip radiant_wrapper*.whl "radiant/*" -d .
-            echo '
-            from radiant.wrapper import html_server
-            with open(".p4a", "r", encoding="utf-8") as f:
-                for line in f:
-                    if line.strip().startswith("--port"):
-                        PORT = int(line.split()[1])
-            html_server.main(ip="127.0.0.1", port=PORT)
-            ' > main.py
-          fi
-      
-          # Remove indentation (2-4 spaces) at the start of each line in main.py
-          sed -i 's/^[[:space:]]\{2,4\}//' main.py
-  
-          # Cleanup downloaded wheel files
-          if ls *.whl 1> /dev/null 2>&1; then rm *.whl; fi
-
-          # Configure build inclusion/exclusion rules
-          # Exclude Python bytecode files
-          echo "*.pyc" > blacklist.txt
-          
-          # Include SQLite libraries and Python source files
-          echo "sqlite3/*" >> whitelist.txt
-          echo "lib-dynload/_sqlite3.so" >> whitelist.txt
-          echo "*.py" >> whitelist.txt
-          
-          # Add build configuration settings to .p4a file
-          echo "--no-byte-compile-python" >> .p4a
-          echo "--private ." >> .p4a
-          echo "--bootstrap webview" >> .p4a
-          echo "--whitelist whitelist.txt" >> .p4a
-          echo "" >> .p4a
-  
-          # Build the Android APK for ARM64 architecture
-          radiant_p4a apk --arch arm64-v8a
+          pass
+#          # Pull the Docker image used for building Android APKs
+#          docker pull dunderlab/radiant_p4a:latest
+#
+#          # Get the distribution name from .p4a config file
+#          DIST_NAME=$(grep -E '^--dist_name ' .p4a | awk '{print $2}')
+#
+#          # Handle Radiant Framework
+#          if [ -f "main.py" ] && grep -q "radiant.wrapper" main.py; then
+#              pip download  --no-deps radiant-framework
+#              unzip radiant_framework*.whl "radiant/*" -d .
+#          fi
+#
+#          # Handle Django app setup
+#          if [ -f "$DIST_NAME/manage.py" ]; then
+#            pip download --no-deps django
+#            unzip django*.whl "django/*" -d .
+#            pip download  --no-deps radiant-wrapper
+#            unzip radiant_wrapper*.whl "radiant/*" -d .
+#            echo '
+#            from radiant.wrapper import django_server
+#            with open(".p4a", "r", encoding="utf-8") as f:
+#                for line in f:
+#                    if line.strip().startswith("--port"):
+#                        PORT = int(line.split()[1])
+#                    if line.strip().startswith("--dist_name"):
+#                        DIST_NAME = line.split()[1].strip()
+#            sys.path.append(os.path.join(os.path.dirname(__file__)))
+#            sys.path.append(os.path.join(os.path.dirname(__file__), DIST_NAME))
+#            django_server.main(DIST_NAME, ip="127.0.0.1", port=PORT)
+#            ' > main.py
+#          fi
+#
+#          # Handle static HTML app setup
+#          # Creates main.py with simple HTTP server for static files
+#          if [ -f "index.html" ]; then
+#            pip download  --no-deps radiant-wrapper
+#            unzip radiant_wrapper*.whl "radiant/*" -d .
+#            echo '
+#            from radiant.wrapper import html_server
+#            with open(".p4a", "r", encoding="utf-8") as f:
+#                for line in f:
+#                    if line.strip().startswith("--port"):
+#                        PORT = int(line.split()[1])
+#            html_server.main(ip="127.0.0.1", port=PORT)
+#            ' > main.py
+#          fi
+#
+#          # Remove indentation (2-4 spaces) at the start of each line in main.py
+#          sed -i 's/^[[:space:]]\{2,4\}//' main.py
+#
+#          # Cleanup downloaded wheel files
+#          if ls *.whl 1> /dev/null 2>&1; then rm *.whl; fi
+#
+#          # Configure build inclusion/exclusion rules
+#          # Exclude Python bytecode files
+#          echo "*.pyc" > blacklist.txt
+#
+#          # Include SQLite libraries and Python source files
+#          echo "sqlite3/*" >> whitelist.txt
+#          echo "lib-dynload/_sqlite3.so" >> whitelist.txt
+#          echo "*.py" >> whitelist.txt
+#
+#          # Add build configuration settings to .p4a file
+#          echo "--no-byte-compile-python" >> .p4a
+#          echo "--private ." >> .p4a
+#          echo "--bootstrap webview" >> .p4a
+#          echo "--whitelist whitelist.txt" >> .p4a
+#          echo "" >> .p4a
+#
+#          # Build the Android APK for ARM64 architecture
+#          radiant_p4a apk --arch arm64-v8a
 
       - name: Upload APKs as Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Android APK # Name for the uploaded artifact
           path: ./*.apk # Path pattern to find APK files for upload
+
+
+
+      # ADDED: Compute release metadata (dist name, version, tag)
+      - name: Compute metadata
+        id: meta
+        run: |
+          set -e
+          DIST_NAME=$(grep -E '^--dist_name ' .p4a | awk '{print $2}')
+          VERSION=$(grep -E '^--version ' .p4a | awk '{print $2}')
+          if [ -z "$VERSION" ]; then
+            VERSION=$(date -u +'%Y.%m.%d-%H%M%S')
+          fi
+          TAG="${DIST_NAME}-${VERSION}"
+          echo "dist_name=$DIST_NAME" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      # ADDED: Install GitHub CLI
+      - name: Install GitHub CLI
+        uses: cli/cli@v2
+
+      # ADDED: Create release in target repo
+      - name: Create release in dunderlab/Release-APK
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PAT }}   # PAT with repo write on target repo
+          TARGET_REPO: dunderlab/Release-APK
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          set -e
+          gh release view "$TAG" -R "$TARGET_REPO" >/dev/null 2>&1 || \
+          gh release create "$TAG" -R "$TARGET_REPO" \
+            --title "$TAG" \
+            --notes "Automated release from ${{ github.repository }}@${{ github.sha }}"
+
+      # ADDED: Upload all APKs as assets
+      - name: Upload APK assets
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PAT }}
+          TARGET_REPO: dunderlab/Release-APK
+          TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          set -e
+          shopt -s nullglob
+          for f in ./*.apk; do
+            gh release upload "$TAG" "$f" -R "$TARGET_REPO" --clobber
+            echo "URL: https://github.com/$TARGET_REPO/releases/download/$TAG/$(basename "$f")"
+          done
