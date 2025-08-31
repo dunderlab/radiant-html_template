@@ -15,8 +15,9 @@ jobs:
 
       - name: Install Radiant-Wrapper
         run: |
-          # Installs the Radiant-Wrapper package for building Android apps
-          pip install radiant-wrapper
+          echo "Done'nt"
+#          # Installs the Radiant-Wrapper package for building Android apps
+#          pip install radiant-wrapper
 
       - name: Execute Command in Docker Container
         run: |
