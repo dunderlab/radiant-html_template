@@ -116,10 +116,6 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      # ADDED: Install GitHub CLI
-      - name: Install GitHub CLI
-        uses: cli/cli@v2
-
       # ADDED: Create release in target repo
       - name: Create release in dunderlab/Release-APK
         env:
