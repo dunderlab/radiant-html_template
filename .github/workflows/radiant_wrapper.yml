@@ -20,7 +20,7 @@ jobs:
 
       - name: Execute Command in Docker Container
         run: |
-          pass
+          echo "Done'nt"
 #          # Pull the Docker image used for building Android APKs
 #          docker pull dunderlab/radiant_p4a:latest
 #
